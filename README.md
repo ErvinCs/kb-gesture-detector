@@ -1,1 +1,2 @@
-# kb-pattern-detector
+# Pattern Memo
+Saves gesture typing input while active.
