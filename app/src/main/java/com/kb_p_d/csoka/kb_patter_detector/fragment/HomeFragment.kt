@@ -1,6 +1,8 @@
 package com.kb_p_d.csoka.kb_patter_detector.fragment
 
 import android.Manifest
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.gesture.GestureOverlayView
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -21,6 +23,8 @@ import android.os.Environment
 import java.io.File.separator
 import android.os.Environment.getExternalStorageDirectory
 import android.support.annotation.NonNull
+import android.text.InputType
+import android.widget.EditText
 import com.kb_p_d.csoka.kb_patter_detector.Code
 import java.io.File
 import java.io.FileOutputStream
@@ -31,6 +35,7 @@ class HomeFragment : Fragment() {
     lateinit var gestureOverlayView: GestureOverlayView
     lateinit var buttonSave: Button
     lateinit var buttonDiscard: Button
+    lateinit var etSaveName: EditText
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         currentView = inflater.inflate(R.layout.fragment_home, null)
@@ -38,6 +43,7 @@ class HomeFragment : Fragment() {
         gestureOverlayView = currentView.findViewById(R.id.paint_pad)
         buttonSave = currentView.findViewById(R.id.btnSave)
         buttonDiscard = currentView.findViewById(R.id.btnDiscard)
+        etSaveName = currentView.findViewById(R.id.etSaveName)
 
         gestureOverlayView.addOnGesturePerformedListener(GestureListenerImpl())
         buttonSave.setOnClickListener{ checkPermissions() }
@@ -65,7 +71,7 @@ class HomeFragment : Fragment() {
             val folder = File(filePath)
             if(!File(filePath).exists())
                 folder.mkdirs()
-            filePath += File.separator + "pattern.png"
+            filePath += File.separator + etSaveName.text.toString().trim() + ".png"
 
             val file = File(filePath)
             file.createNewFile()
