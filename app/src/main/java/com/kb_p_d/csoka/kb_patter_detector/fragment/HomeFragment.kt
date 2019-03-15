@@ -19,6 +19,9 @@ import android.content.pm.PackageManager
 import android.util.Log
 import android.widget.Toast
 import android.graphics.Bitmap
+import android.media.MediaScannerConnection
+import android.net.Uri
+import android.os.AsyncTask
 import android.os.Environment
 import java.io.File.separator
 import android.os.Environment.getExternalStorageDirectory
@@ -29,7 +32,6 @@ import com.kb_p_d.csoka.kb_patter_detector.Code
 import java.io.File
 import java.io.FileOutputStream
 
-//TODO - pattern naming scheme
 class HomeFragment : Fragment() {
     lateinit var currentView: View
     lateinit var gestureOverlayView: GestureOverlayView
@@ -49,7 +51,23 @@ class HomeFragment : Fragment() {
         buttonSave.setOnClickListener{ checkPermissions() }
         buttonDiscard.setOnClickListener{ gestureOverlayView.clear(false) }
 
+        //scanFiles(Environment.getExternalStorageDirectory().toString() + File.separator + "DCIM" + File.separator + Code.STORAGE_PATH.key)
+
         return currentView
+    }
+
+    //TODO - make this AsyncTask
+    //TODO - check if it works;
+    //TODO maybe - don't scan all the iamges every time; only scan new images and perform a scan on installation
+    //TODO maybe2 - add a "scan" functionality
+    private fun scanFiles(path: String) {
+        MediaScannerConnection.scanFile(super.requireContext(),
+            arrayOf(path), null,
+            object : MediaScannerConnection.OnScanCompletedListener {
+                override fun onScanCompleted(path: String, uri: Uri) {
+                        Log.d("HomeFragment", "scanned : $path")
+                }
+            })
     }
 
     private fun savePattern() {
@@ -66,12 +84,16 @@ class HomeFragment : Fragment() {
             // Create a new bitmap
             val bitmap = Bitmap.createBitmap(drawingCacheBitmap)
 
+            //TODO - to kb-pat-det/drawn
+
             // Get image file save path and name.
             var filePath = Environment.getExternalStorageDirectory().toString() + File.separator + "DCIM" + File.separator + Code.STORAGE_PATH.key
             val folder = File(filePath)
             if(!File(filePath).exists())
                 folder.mkdirs()
             filePath += File.separator + etSaveName.text.toString().trim() + ".png"
+
+            //TODO - if (name is empty) { Don't save; show a message - Toast  or something more aggressive }
 
             val file = File(filePath)
             file.createNewFile()

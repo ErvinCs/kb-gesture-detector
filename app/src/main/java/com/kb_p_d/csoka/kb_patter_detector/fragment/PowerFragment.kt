@@ -16,6 +16,8 @@ class PowerFragment : Fragment() {
     lateinit var currentView: View
     lateinit var switch: Switch
 
+    //TODO - a lot - use HUDService to register gestures and save each gesture (when finger is lifted from the screen) automatically to kb-pat-det/captured
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         currentView = inflater.inflate(R.layout.fragment_power, null)
         switch = currentView.findViewById(R.id.switchPower)
