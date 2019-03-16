@@ -42,7 +42,7 @@ class HomeFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         currentView = inflater.inflate(R.layout.fragment_home, null)
 
-        gestureOverlayView = currentView.findViewById(R.id.paint_pad)
+        gestureOverlayView = currentView.findViewById(R.id.paint_pad_home)
         buttonSave = currentView.findViewById(R.id.btnSave)
         buttonDiscard = currentView.findViewById(R.id.btnDiscard)
         etSaveName = currentView.findViewById(R.id.etSaveName)
@@ -56,6 +56,7 @@ class HomeFragment : Fragment() {
         return currentView
     }
 
+    //TODO - OR just remove this and use the LibraryFragment
     //TODO - make this AsyncTask
     //TODO - check if it works;
     //TODO maybe - don't scan all the iamges every time; only scan new images and perform a scan on installation
