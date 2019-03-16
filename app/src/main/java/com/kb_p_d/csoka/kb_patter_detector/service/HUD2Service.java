@@ -3,19 +3,26 @@ package com.kb_p_d.csoka.kb_patter_detector.service;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.*;
-import android.net.Uri;
-import android.os.Build;
+import android.os.Environment;
 import android.os.IBinder;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Toast;
+import com.kb_p_d.csoka.kb_patter_detector.Code;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.text.DateFormat;
+import java.util.Date;
 
 public class HUD2Service extends Service {
+    private final String TAG = "HUD2Serv: ";
+
     HUDView mView;
 
     @Override
@@ -26,7 +33,7 @@ public class HUD2Service extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Toast.makeText(getBaseContext(), "onCreate", Toast.LENGTH_LONG).show();
+        Toast.makeText(getBaseContext(), "HUD Created", Toast.LENGTH_LONG).show();
         mView = new HUDView(this);
 
 
@@ -35,15 +42,16 @@ public class HUD2Service extends Service {
          (types between FIRST_APPLICATION_WINDOW and LAST_APPLICATION_WINDOW)
          but below critical system windows like the status bar or IME.
          */
+
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(
-                1,
-                1,
+                WindowManager.LayoutParams.MATCH_PARENT,
+                Resources.getSystem().getDisplayMetrics().heightPixels / 2,
                 WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
                 // | FLAG_LAYOUT_IN_SCREEN
                 WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSLUCENT);
 
-        params.gravity = Gravity.END | Gravity.TOP;
+        params.gravity = Gravity.END | Gravity.BOTTOM;
         params.setTitle("Load Average");
         WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
         wm.addView(mView, params);
@@ -52,7 +60,7 @@ public class HUD2Service extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Toast.makeText(getBaseContext(), "onDestroy", Toast.LENGTH_LONG).show();
+        Toast.makeText(getBaseContext(), "HUD Destroyed", Toast.LENGTH_LONG).show();
         if (mView != null) {
             ((WindowManager) getSystemService(WINDOW_SERVICE)).removeView(mView);
             mView = null;
@@ -60,8 +68,10 @@ public class HUD2Service extends Service {
     }
 
 
+    //TODO
     class HUDView extends ViewGroup {
-        private Paint mLoadPaint;
+        private final String TAG = "HUDView: ";
+        private final String COLOR_CODE = "#87CEFA";
 
         private Path drawPath;
         private Paint drawPaint,canvasPaint;
@@ -70,23 +80,17 @@ public class HUD2Service extends Service {
 
         public HUDView(Context context) {
             super(context);
-            Toast.makeText(getContext(), "HUDView", Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "HUDView", Toast.LENGTH_SHORT).show();
             setUpDrawing();
-
-//            mLoadPaint = new Paint();
-//            mLoadPaint.setAntiAlias(true);
-//            mLoadPaint.setTextSize(10);
-//            mLoadPaint.setARGB(255, 255, 0, 0);
         }
 
         private void setUpDrawing() {
             drawPath = new Path();
             drawPaint = new Paint();
-            drawPaint.setColor(Color.parseColor("#ff0000"));
+            drawPaint.setColor(Color.parseColor(COLOR_CODE));
             drawPaint.setAntiAlias(true);
-            drawPaint.setStrokeWidth(20);
+            drawPaint.setStrokeWidth(15);
             drawPaint.setStyle(Paint.Style.STROKE);
-            //drawPaint.setStrokeJoin(Paint.Join.ROUND);
             drawPaint.setStrokeCap(Paint.Cap.ROUND);
             canvasPaint = new Paint(Paint.DITHER_FLAG);
         }
@@ -100,7 +104,7 @@ public class HUD2Service extends Service {
 
         @Override
         protected void onDraw(Canvas canvas) {
-            Toast.makeText(getBaseContext(), "onDraw - HUD", Toast.LENGTH_LONG).show();
+            //Toast.makeText(getBaseContext(), "onDraw - HUD", Toast.LENGTH_LONG).show();
             super.onDraw(canvas);
             canvas.drawBitmap(canvasBitmap,0,0,canvasPaint);
             canvas.drawPath(drawPath,drawPaint);
@@ -115,28 +119,86 @@ public class HUD2Service extends Service {
         @Override
         public boolean onTouchEvent(MotionEvent event) {
             //return super.onTouchEvent(event);
-            Toast.makeText(getContext(), "onTouchEvent", Toast.LENGTH_LONG).show();
-            int action=event.getAction();
-            float touchX=event.getX();
-            float touchY=event.getY();
+            //Toast.makeText(getContext(), "onTouchEvent", Toast.LENGTH_SHORT).show();
+            Log.d(TAG, "onTouchEvent");
+
+            canvasBitmap.eraseColor(Color.WHITE);
+
+            int action = event.getAction();
+            float touchX = event.getX();
+            float touchY = event.getY();
             switch (action)
             {
                 case MotionEvent.ACTION_DOWN:
                     drawPath.moveTo(touchX,touchY);
+
+                    Log.d(TAG, "ACTION_DOWN");
+                    //Toast.makeText(getContext(), "ACTION_DOWN", Toast.LENGTH_SHORT).show();
                     break;
                 case MotionEvent.ACTION_MOVE:
                     drawPath.lineTo(touchX,touchY);
+
+                    Log.d(TAG, "ACTION_MOVE");
+                    //Toast.makeText(getContext(), "ACTION_MOVE", Toast.LENGTH_SHORT).show();
                     break;
                 case MotionEvent.ACTION_UP:
+                    Log.d(TAG, "ACTION_UP");
+                    //Toast.makeText(getContext(), "ACTION_UP", Toast.LENGTH_SHORT).show();
+
                     drawPath.lineTo(touchX,touchY);
                     drawCanvas.drawPath(drawPath,drawPaint);
+                    savePattern();
                     drawPath.reset();
                     break;
                 default:
+                    drawPath.reset();
+                    Log.d(TAG, "Returned false");
                     return false;
             }
+            Log.d(TAG, "Invalidated");
             invalidate();
             return true;
+        }
+
+        private void savePattern() {
+            try {
+                // Create a new bitmap
+                //val bitmap = Bitmap.createBitmap(drawingCacheBitmap)
+
+                //TODO - to kb-pat-det/captured
+
+                // Get image file save path and name.
+                String filePath = Environment.getExternalStorageDirectory().toString() + File.separator + "DCIM" + File.separator + Code.STORAGE_PATH_HUD.getKey();
+                File folder = new File(filePath);
+                if(!folder.exists())
+                    folder.mkdirs();
+
+                DateFormat dateFormat = DateFormat.getDateTimeInstance();
+                Date date = new Date();
+                filePath += File.separator + dateFormat.format(date).toString().trim().replaceAll("[ :]*", "") + ".png";
+
+
+                File file = new File(filePath);
+                file.createNewFile();
+                FileOutputStream fileOutputStream = new FileOutputStream(file);
+
+                // Compress bitmap to png image.
+                canvasBitmap.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream);
+
+                // Flush bitmap to image file.
+                fileOutputStream.flush();
+
+                // Close the output stream.
+                fileOutputStream.close();
+
+                canvasBitmap.eraseColor(Color.WHITE);
+
+                Toast.makeText(super.getContext(), "Pattern saved", Toast.LENGTH_SHORT).show();
+            } catch (Exception ex) {
+                Log.d(TAG, ex.getMessage());
+                ex.printStackTrace();
+            }
+
         }
     }
 }

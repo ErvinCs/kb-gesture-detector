@@ -3,9 +3,7 @@ package com.kb_p_d.csoka.kb_patter_detector.fragment
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.gesture.GestureOverlayView
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.support.v4.app.ActivityCompat
@@ -15,37 +13,37 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CompoundButton
 import android.widget.Switch
 import android.widget.Toast
 import com.kb_p_d.csoka.kb_patter_detector.Code
 import com.kb_p_d.csoka.kb_patter_detector.R
 import com.kb_p_d.csoka.kb_patter_detector.service.HUD2Service
-import com.kb_p_d.csoka.kb_patter_detector.service.HUDService
 
 //TODO - app bar on top while the service/app is running in the background (soundcloud-like)
 //TODO - save captured patterns with name: DD-MM-YYY_HH-MM-SS
 class PowerFragment : Fragment() {
+    private val TAG: String = "PowerFragment: "
+
     lateinit var currentView: View
     lateinit var switch: Switch
-    lateinit var gestureOverlayView: GestureOverlayView
+    //lateinit var gestureOverlayView: GestureOverlayView
 
     //TODO - a lot - use HUDService to register gestures and save each gesture (when finger is lifted from the screen) automatically to kb-pat-det/captured
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         currentView = inflater.inflate(R.layout.fragment_power, null)
         switch = currentView.findViewById(R.id.switchPower)
-        gestureOverlayView = currentView.findViewById(R.id.paint_pad_power)
+        //gestureOverlayView = currentView.findViewById(R.id.paint_pad_power)
 
         checkPermissions()
 
         switch.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                Log.d("PowerFrag", "isChecked = true")
+                Log.d(TAG, "isChecked = true")
                 switch.isChecked = true
                 activity!!.startService(Intent(activity, HUD2Service::class.java))
             } else {
-                Log.d("PowerFrag", "isChecked = false")
+                Log.d(TAG, "isChecked = false")
                 switch.isChecked = false
                 activity!!.stopService(Intent(activity, HUD2Service::class.java))
             }
@@ -69,7 +67,7 @@ class PowerFragment : Fragment() {
                 )
             }
         } catch (e: Exception) {
-            Log.v("Signature Gestures", e.message)
+            Log.d(TAG, e.message)
             e.printStackTrace()
         }
 
@@ -91,7 +89,7 @@ class PowerFragment : Fragment() {
                 //activity!!.startService(Intent(activity, HUD2Service::class.java))
                 switch.isChecked = true
             } else {
-                Toast.makeText(super.requireContext(), "You denied permission.", Toast.LENGTH_LONG).show()
+                Toast.makeText(super.requireContext(), "You denied permission.", Toast.LENGTH_SHORT).show()
             }
         }
 

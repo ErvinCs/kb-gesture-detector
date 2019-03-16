@@ -1,8 +1,6 @@
 package com.kb_p_d.csoka.kb_patter_detector.fragment
 
 import android.Manifest
-import android.app.AlertDialog
-import android.content.DialogInterface
 import android.gesture.GestureOverlayView
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -13,7 +11,6 @@ import android.view.ViewGroup
 import android.widget.Button
 import com.kb_p_d.csoka.kb_patter_detector.R
 import com.kb_p_d.csoka.kb_patter_detector.service.GestureListenerImpl
-import com.kb_p_d.csoka.kb_patter_detector.MainActivity
 import android.support.v4.app.ActivityCompat
 import android.content.pm.PackageManager
 import android.util.Log
@@ -21,18 +18,15 @@ import android.widget.Toast
 import android.graphics.Bitmap
 import android.media.MediaScannerConnection
 import android.net.Uri
-import android.os.AsyncTask
 import android.os.Environment
-import java.io.File.separator
-import android.os.Environment.getExternalStorageDirectory
-import android.support.annotation.NonNull
-import android.text.InputType
 import android.widget.EditText
 import com.kb_p_d.csoka.kb_patter_detector.Code
 import java.io.File
 import java.io.FileOutputStream
 
 class HomeFragment : Fragment() {
+    private val TAG: String = "HomeFragment: "
+
     lateinit var currentView: View
     lateinit var gestureOverlayView: GestureOverlayView
     lateinit var buttonSave: Button
@@ -66,7 +60,7 @@ class HomeFragment : Fragment() {
             arrayOf(path), null,
             object : MediaScannerConnection.OnScanCompletedListener {
                 override fun onScanCompleted(path: String, uri: Uri) {
-                        Log.d("HomeFragment", "scanned : $path")
+                        Log.d(TAG, "scanned : $path")
                 }
             })
     }
@@ -88,7 +82,7 @@ class HomeFragment : Fragment() {
             //TODO - to kb-pat-det/drawn
 
             // Get image file save path and name.
-            var filePath = Environment.getExternalStorageDirectory().toString() + File.separator + "DCIM" + File.separator + Code.STORAGE_PATH.key
+            var filePath = Environment.getExternalStorageDirectory().toString() + File.separator + "DCIM" + File.separator + Code.STORAGE_PATH_HOME.key
             val folder = File(filePath)
             if(!File(filePath).exists())
                 folder.mkdirs()
@@ -111,7 +105,7 @@ class HomeFragment : Fragment() {
 
             Toast.makeText(super.requireContext(), "Signature file is saved to $filePath", Toast.LENGTH_LONG).show()
         } catch (e: Exception) {
-            Log.v("Signature Gestures", e.message)
+            Log.d(TAG, e.message)
             e.printStackTrace()
         }
     }
@@ -132,7 +126,7 @@ class HomeFragment : Fragment() {
                 savePattern()
             }
         } catch (e: Exception) {
-            Log.v("Signature Gestures", e.message)
+            Log.v(TAG, e.message)
             e.printStackTrace()
         }
     }
@@ -145,7 +139,7 @@ class HomeFragment : Fragment() {
             if (grantResultsLength > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 savePattern()
             } else {
-                Toast.makeText(super.requireContext(), "You denied write external storage permission.", Toast.LENGTH_LONG).show()
+                Toast.makeText(super.requireContext(), "You denied write external storage permission.", Toast.LENGTH_SHORT).show()
             }
         }
     }

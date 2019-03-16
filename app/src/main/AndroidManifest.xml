@@ -23,7 +23,6 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".service.HUDService" />
         <service android:name=".service.HUD2Service"/>
 
     </application>

@@ -17,6 +17,8 @@ import com.kb_p_d.csoka.kb_patter_detector.R
 //TODO - Separate folders in the app folder for: drawn patterns, captured patterns (these will be automatically captured)
 //TODO - Separate access from the library to draw and to captured (maybe)
 class LibraryFragment : Fragment() {
+    private val TAG: String = "LibraryFragment: "
+
     lateinit var currentView: View
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -41,7 +43,7 @@ class LibraryFragment : Fragment() {
                 )
             }
         } catch (e: Exception) {
-            Log.v("Signature Gestures", e.message)
+            Log.d(TAG, e.message)
             e.printStackTrace()
         }
     }
