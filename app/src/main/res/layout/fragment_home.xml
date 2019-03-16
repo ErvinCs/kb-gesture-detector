@@ -6,21 +6,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    <TextView
-            android:text="Home"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/tvHome"
-            android:layout_marginStart="8dp" android:layout_marginEnd="8dp"
-            android:textAllCaps="false"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginTop="24dp" app:layout_constraintTop_toTopOf="parent"/>
-
     <android.gesture.GestureOverlayView
-            android:id="@+id/paint_pad"
+            android:id="@+id/paint_pad_home"
             android:layout_width="match_parent"
-            android:layout_height="442dp"
+            android:layout_height="448dp"
             android:background="@android:color/background_light"
             android:fadeEnabled="false"
             android:fadeOffset="10000"
@@ -38,14 +27,23 @@
             android:layout_height="wrap_content"
             android:id="@+id/btnSave" android:layout_marginTop="8dp"
             app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="8dp" app:layout_constraintEnd_toStartOf="@+id/tvHome"
-            android:layout_marginEnd="8dp"/>
+            android:layout_marginStart="8dp"
+    />
     <Button
             android:text="Discard"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/btnDiscard" android:layout_marginTop="8dp"
-            app:layout_constraintTop_toTopOf="parent" app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginEnd="8dp"/>
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/btnSave" android:layout_marginStart="8dp"/>
+    <EditText
+            android:layout_width="167dp"
+            android:layout_height="45dp"
+            android:inputType="textPersonName"
+            android:hint="Name"
+            android:ems="10"
+            android:id="@+id/etSaveName" android:layout_marginTop="8dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/btnDiscard" android:layout_marginStart="8dp"/>
 
 </android.support.constraint.ConstraintLayout>
